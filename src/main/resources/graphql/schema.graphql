@@ -1,0 +1,50 @@
+type AuthPayload {
+    accessToken: String!
+    refreshToken: String!
+    expiresIn: Int!
+}
+
+input DictionaryInput {
+    word: String!
+    translation: String
+}
+
+type ErrorResponse {
+    error: String!
+}
+
+input LoginInput {
+    email: String!
+    password: String!
+}
+
+union LoginResult = AuthPayload | ErrorResponse
+
+type Mutation {
+    signUp(credentials: LoginInput!): LoginResult!
+    signIn(credentials: LoginInput!): LoginResult!
+    addWord(newWord: DictionaryInput!): StandardResponse!
+    submitAnswer(answer: String!): SubmitAnswerResult!
+    stopTraining: StandardResponse!
+}
+
+type Query {
+    hello: String!
+    getTranslation(word: String!): StandardResponse!
+    getRandomTranslation: String!
+    startTraining: SubmitAnswerResult!
+}
+
+union StandardResponse = SuccessResponse | ErrorResponse
+
+union SubmitAnswerResult = TrainingSession | ErrorResponse | SuccessResponse
+
+type SuccessResponse {
+    message: String!
+}
+
+type TrainingSession {
+    word: String!
+    completed: Int!
+    total: Int!
+}

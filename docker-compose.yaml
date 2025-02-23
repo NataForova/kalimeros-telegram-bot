@@ -1,0 +1,25 @@
+services:
+    telegram-bot:
+      build: ./
+      container_name: telegram-bot
+      ports:
+        - "8085:8085"
+      depends_on:
+        - telegram-mongo
+      env_file:
+        - .env
+
+    telegram-mongo:
+      image: mongo:latest
+      container_name: telegram-mongo
+      restart: always
+      ports:
+        - "27019:27017"
+      environment:
+        MONGO_INITDB_DATABASE: telegram-bot-service
+      volumes:
+        - mongodata:/data/db
+
+volumes:
+  mongodata:
+

@@ -96,6 +96,7 @@ public class TelegramService extends TelegramLongPollingBot {
                                             "<b>/training</b> - start daily training based on your word list\n" +
                                             "<b>/stop</b> - stop training\n" +
                                             "<b>/random</b> - get random word for translation\n";
+                                    break;
                                 default:
                                     response = "Unknown or not implemented command";
                                     break;

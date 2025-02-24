@@ -11,6 +11,7 @@ public enum TelegramCommand {
     ANSWER("/answer"),
     STOP_TRAINING("/stop"),
     GET_RANDOM_WORD("/random"),
+    HELP("/help"),
     UNKNOWN("");
 
 

@@ -91,11 +91,11 @@ public class TelegramService extends TelegramLongPollingBot {
                                     break;
                                 case HELP:
                                     response = "Available commands: \n" +
-                                            "<b>/add word translation</b> - add word with translation to dictionary, only word as parameter is possible\n" +
-                                            "<b>/translate word</b> - find translation for word\n" +
-                                            "<b>/training</b> - start daily training based on your word list\n" +
-                                            "<b>/stop</b> - stop training\n" +
-                                            "<b>/random</b> - get random word for translation\n";
+                                            "/add word translation - add word with translation to dictionary, only word as parameter is possible\n" +
+                                            "/translate word - find translation for word\n" +
+                                            "/training - start daily training based on your word list\n" +
+                                            "/stop - stop training\n" +
+                                            "/random - get random word for translation\n";
                                     break;
                                 default:
                                     response = "Unknown or not implemented command";

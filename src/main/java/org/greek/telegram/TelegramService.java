@@ -191,7 +191,7 @@ public class TelegramService extends TelegramLongPollingBot {
         var user = telegramUserRepository.findByTelegramUserName(userName);
         TelegramCommand prevCommand = START;
         if (user.isPresent()) {
-            prevCommand = user.get().getPreviousCommand();
+            prevCommand = user.get().getPreviousCommand() != null ? user.get().getPreviousCommand() : START;
         }
         if (messageText.contains(START.getCommand())) {
             return START;
@@ -207,6 +207,8 @@ public class TelegramService extends TelegramLongPollingBot {
             return START_TRAINING;
         } else if (messageText.contains(STOP_TRAINING.getCommand())) {
             return STOP_TRAINING;
+        }  else if (messageText.contains(HELP.getCommand())) {
+                return STOP_TRAINING;
         } else if (messageText.contains(GET_RANDOM_WORD.getCommand())) {
             return GET_RANDOM_WORD;
         } else if (prevCommand.equals(START_TRAINING) || prevCommand.equals(ANSWER) && !messageText.isEmpty()) {

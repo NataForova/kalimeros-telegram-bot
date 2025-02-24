@@ -1,5 +1,5 @@
 # Telegram bot service
-Service processes commands from telegram bot t.me/KalimerosBot
+Service processes commands from telegram [bot](https://t.me/KalimerosBot)
 
 
 # ENVIRONMENT

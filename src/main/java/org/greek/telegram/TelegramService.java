@@ -208,7 +208,7 @@ public class TelegramService extends TelegramLongPollingBot {
         } else if (messageText.contains(STOP_TRAINING.getCommand())) {
             return STOP_TRAINING;
         }  else if (messageText.contains(HELP.getCommand())) {
-                return STOP_TRAINING;
+                return HELP;
         } else if (messageText.contains(GET_RANDOM_WORD.getCommand())) {
             return GET_RANDOM_WORD;
         } else if (prevCommand.equals(START_TRAINING) || prevCommand.equals(ANSWER) && !messageText.isEmpty()) {

@@ -1,7 +1,8 @@
 # Telegram bot service
-Process commands from telegram bot t.me/KalimerosBot
-# Api documentation:
+Service processes commands from telegram bot t.me/KalimerosBot
 
+
+# ENVIRONMENT
 env variables for this app
 
 ````
@@ -14,4 +15,4 @@ TELEGRAM_BOT_MONGO_URI= #url for mongo data base
 
 run application
 ````
-docker-compose up --build -d
+docker compose up --build -d

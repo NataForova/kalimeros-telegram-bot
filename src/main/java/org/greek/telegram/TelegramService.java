@@ -10,9 +10,13 @@ import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
+
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.greek.telegram.model.TelegramCommand.*;
@@ -64,41 +68,37 @@ public class TelegramService extends TelegramLongPollingBot {
                     var userName = update.getMessage().getChat().getUserName();
                     if (text != null && !text.trim().isEmpty()) {
                         var chatId = message.getChatId();
-                        String response = "Received message: " + text;
+                        SendMessage response = new SendMessage(String.valueOf(chatId), "");
                         try {
                             var command = findCommand(text, userName);
                             switch (command) {
                                 case START:
-                                    response = String.format("Hi %s and yeah! Kalimeros Bot was started!", userName);
+                                    response.setText(String.format("Hi %s and yeah! Kalimeros Bot was started!", userName));
                                     break;
                                 case ADD_WORD:
-                                    response = addWord(userName, text);
+                                    response.setText(addWord(userName, text));
                                     break;
                                 case FIND_TRANSLATION:
-                                    response = findTranslation(userName, text);
+                                    response.setText(findTranslation(userName, text));
                                     break;
                                 case START_TRAINING:
-                                    response = startTraining(userName);
+                                    response.setText(startTraining(userName));
                                     break;
                                 case ANSWER:
-                                    response = submitAnswer(userName, text);
+                                    response.setText(submitAnswer(userName, text));
                                     break;
                                 case STOP_TRAINING:
-                                    response = stopTraining(userName);
+                                    response.setText(stopTraining(userName));
                                     break;
                                 case GET_RANDOM_WORD:
-                                    response = getRandomWord(userName);
+                                    response.setText(getRandomWord(userName));
                                     break;
                                 case HELP:
-                                    response = "Available commands: \n" +
-                                            "/add word translation - add word with translation to dictionary, only word as parameter is possible\n" +
-                                            "/translate word - find translation for word\n" +
-                                            "/training - start daily training based on your word list\n" +
-                                            "/stop - stop training\n" +
-                                            "/random - get random word for translation\n";
+                                    response.setText("Выберите действие:");
+                                    response.setReplyMarkup(getHelpKeyboard());
                                     break;
                                 default:
-                                    response = "Unknown or not implemented command";
+                                    response.setText("Unknown or not implemented command");
                                     break;
                             }
                             var user = telegramUserRepository.findByTelegramUserName(userName);
@@ -109,7 +109,8 @@ public class TelegramService extends TelegramLongPollingBot {
                             }
                             sendBotAnswer(response, chatId);
                         } catch (Exception e) {
-                            sendBotAnswer("Error during processing message: "+ e.getMessage() +". Please try again later", chatId);
+                            response.setText("Error during processing message: "+ e.getMessage() +". Please try again later");
+                            sendBotAnswer(response, chatId);
                             e.printStackTrace();
                             log.error("Error during processing message", e);
                         }
@@ -121,10 +122,71 @@ public class TelegramService extends TelegramLongPollingBot {
                 log.error("Error during processing message", e);
             }
         }
+        if (update.hasCallbackQuery()) {
+            String callbackData = update.getCallbackQuery().getData();
+            Long chatId = update.getCallbackQuery().getMessage().getChatId();
+            SendMessage response = new SendMessage(String.valueOf(chatId), "");
+            try{
+                switch (callbackData) {
+                    case "/add":
+                        response.setText("Введите слово и его перевод для добавления в словарь.");
+                        break;
+                    case "/translate":
+                        response.setText("Введите слово для перевода.");
+                        break;
+                    case "/training":
+                        response.setText(startTraining(update.getCallbackQuery().getFrom().getUserName()));
+                        break;
+                    case "/stop":
+                        response.setText(stopTraining(update.getCallbackQuery().getFrom().getUserName()));
+                        break;
+                    case "/random":
+                        response.setText(getRandomWord(update.getCallbackQuery().getFrom().getUserName()));
+                        break;
+                    default:
+                        response.setText("Неизвестная команда.");
+                        break;
+                }
+                sendBotAnswer(response, chatId);
+            } catch (Exception e) {
+                response.setText("Error during processing message: "+ e.getMessage() +". Please try again later");
+                sendBotAnswer(response, chatId);
+                e.printStackTrace();
+                log.error("Error during processing message", e);
+            }
+        }
     }
 
-    private void sendBotAnswer(String answer, Long chatId) {
-        SendMessage sendMessage = new SendMessage(String.valueOf(chatId), answer);
+    private InlineKeyboardMarkup getHelpKeyboard() {
+        InlineKeyboardMarkup markup = new InlineKeyboardMarkup();
+
+        List<List<InlineKeyboardButton>> rows = new ArrayList<>();
+
+        InlineKeyboardButton addWordButton = new InlineKeyboardButton("➕ Добавить слово");
+        addWordButton.setCallbackData("/add");
+
+        InlineKeyboardButton translateButton = new InlineKeyboardButton("🔍 Перевести слово");
+        translateButton.setCallbackData("/translate");
+
+        InlineKeyboardButton trainingButton = new InlineKeyboardButton("🎯 Начать тренировку");
+        trainingButton.setCallbackData("/training");
+
+        InlineKeyboardButton stopTrainingButton = new InlineKeyboardButton("⏹ Остановить тренировку");
+        stopTrainingButton.setCallbackData("/stop");
+
+        InlineKeyboardButton randomWordButton = new InlineKeyboardButton("🎲 Случайное слово");
+        randomWordButton.setCallbackData("/random");
+
+        rows.add(List.of(addWordButton, translateButton));
+        rows.add(List.of(trainingButton, stopTrainingButton));
+        rows.add(List.of(randomWordButton));
+
+        markup.setKeyboard(rows);
+        return markup;
+    }
+
+
+    private void sendBotAnswer(SendMessage sendMessage, Long chatId) {
         try {
             execute(sendMessage);
         } catch (TelegramApiException e) {

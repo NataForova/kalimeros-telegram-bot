@@ -91,11 +91,12 @@ public class TelegramService extends TelegramLongPollingBot {
                                     break;
                                 case HELP:
                                     response = "Available commands: \n" +
-                                            "/add word translation - add word with translation to dictionary, only word as parameter is possible\n" +
-                                            "/translate word - find translation for word\n" +
-                                            "/training - start daily training based on your word list\n" +
-                                            "/stop - stop training\n" +
-                                            "/random - get random word for translation\n";
+                                       "*/add* \\<_word, translation_\\> \\- add word with translation to dictionary, only word as parameter is possible\n" +
+                                       "*/translate* \\<_word_\\> \\- find translation for word\n" +
+                                       "*/training* \\- start daily training based on your word list\n" +
+                                       "*/stop* \\- stop training\n" +
+                                       "*/random* \\- get random word for translation\n";
+
                                     break;
                                 default:
                                     response = "Unknown or not implemented command";
@@ -125,6 +126,7 @@ public class TelegramService extends TelegramLongPollingBot {
 
     private void sendBotAnswer(String answer, Long chatId) {
         SendMessage sendMessage = new SendMessage(String.valueOf(chatId), answer);
+        sendMessage.setParseMode("MarkdownV2");
         try {
             execute(sendMessage);
         } catch (TelegramApiException e) {
